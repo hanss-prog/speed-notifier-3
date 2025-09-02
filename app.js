@@ -25,13 +25,13 @@ const speedSegments = [
     name: "Session Road",
     speedLimit: 30,
     color: "red",
-    path: [[16.4115,120.5965],[16.4110,120.5970],[16.4105,120.5975],[16.4100,120.5980]]
+    path: [[16.41239,120.59766],[16.4110,120.5970],[16.4105,120.5975],[16.4100,120.5980]]
   },
   {
     name: "Military Cutoff",
     speedLimit: 40,
     color: "orange",
-    path: [[16.4030,120.5920],[16.4025,120.5930],[16.4020,120.5940]]
+    path: [[16.4037,120.6005],[16.4025,120.5930],[16.4020,120.5940]]
   }
 ];
 
@@ -42,18 +42,13 @@ const segmentLayers = speedSegments.map(s => ({
 
 // Speed limit mapping by road name
 const roadsSpeeds = {
-  // 🔴 Primary Roads (20 kph)
   "Abanao": 20,
   "Governor Pack Road": 20,
   "Harrison Road": 20,
   "Kayang Street": 20,
-
-  // 🟠 Primary Roads (30 kph)
   "Kennon Road": 30,
   "Quirino Highway": 30,
   "Naguilian Road": 30,
-
-  // 🟠 Secondary Roads (30 kph)
   "Asin Road": 30,
   "Baguio General Hospital flyover": 30,
   "Chanum Street": 30,
@@ -68,8 +63,6 @@ const roadsSpeeds = {
   "PMA Road": 30,
   "Session Road": 20,
   "Western Link": 40,
-
-  // 🟠 Tertiary Roads (30 kph)
   "Andres Bonifacio Street": 30,
   "Bokawkan": 30,
   "Country Club Road": 30,
@@ -98,12 +91,8 @@ const roadsSpeeds = {
   "South Drive": 30,
   "Sto. Tomas–Mount Cabuyao Road": 30,
   "UP Drive": 30,
-
-  // 🟢 Roads with 40 kph
   "Balatoc Road": 40,
   "Eastern Link Circumferential": 40,
-
-  // 🔴 Roads with 20 kph
   "Abad Santos Road": 20,
   "Abanao Extension": 20,
   "Chanum": 20,
@@ -143,12 +132,12 @@ const redRoads = [
   "Zandueta Street"
 ];
 
-// ✅ Helper to choose color based on speed + red zone override
+// ✅ Helper to choose color
 function getColor(limit, name) {
   if (redRoads.includes(name)) return 'red';
-  if (limit === 40) return 'green';
+  if (limit === 40) return 'red';
   if (limit === 30) return 'orange';
-  if (limit <= 20) return 'red';
+  if (limit <= 20) return 'yellow';
   return 'blue';
 }
 
@@ -220,6 +209,25 @@ function onLocationFound(position) {
     if (closest && closest.distance < 10 && !speedWarningShown) {
       const roadName = closest.layer.feature.properties.name;
       const limit = roadsSpeeds[roadName];
+
+      // ✅ Governor Pack Road special notification
+      if (roadName === "Governor Pack Road") {
+        if ("Notification" in window) {
+          if (Notification.permission === "granted") {
+            new Notification("Zone Alert", {
+              body: "You have entered a 20kmph zone road"
+            });
+          } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+              if (permission === "granted") {
+                new Notification("Zone Alert", {
+                  body: "You have entered a 20kmph zone road"
+                });
+              }
+            });
+          }
+        }
+      }
 
       if (limit) {
         alert(`Tips: You've entered a ${limit} km/h zone on ${roadName}`);
