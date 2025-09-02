@@ -25,8 +25,83 @@ const segmentLayers = speedSegments.map(s => ({ ...s, layer: L.polyline(s.path, 
 
 // Speed limit mapping by road name
 const roadsSpeeds = {
-  "Session Road": 30,
-  // (Add your comprehensive road list here with their limits)
+  // 🔴 Primary Roads (20 kph)
+  "Abanao": 20,
+  "Governor Pack Road": 20,
+  "Harrison Road": 20,
+  "Kayang Street": 20,
+
+  // 🟠 Primary Roads (30 kph)
+  "Kennon Road": 30,
+  "Quirino Highway": 30,
+  "Naguilian Road": 30,
+
+  // 🟠 Secondary Roads (assumed 30 kph for cars/motorcycles)
+  "Asin Road": 30,
+  "Baguio General Hospital flyover": 30,
+  "Chanum Street": 30,
+  "Leonard Wood Road": 30,
+  "Loakan Road": 30,
+  "Magsaysay Avenue": 30,
+  "Trinidad Road": 30,
+  "Trinidad Road East Service Road": 30,
+  "Major Mane Road": 30,
+  "Aspiras–Palispis Highway": 30,
+  "Pacdal Road": 30,
+  "PMA Road": 30,
+  "Session Road": 20,
+  "Western Link": 40,
+
+  // 🟠 Tertiary Roads (mostly 30 kph for cars/motorcycles)
+  "Andres Bonifacio Street": 30,
+  "Bokawkan": 30,
+  "Country Club Road": 30,
+  "Demonstration Road": 30,
+  "Engineer’s Hill": 30,
+  "F. Calderon Street": 30,
+  "Ferguson Road": 30,
+  "Gibraltar Road": 30,
+  "Gibraltar Road Wye": 30,
+  "Harrison Road No. 2": 30,
+  "Kayang Extension": 30,
+  "Kisad Road": 30,
+  "Legarda Road": 30,
+  "Leonard Wood": 30,
+  "Lt. Tacay": 30,
+  "Magsaysay Ave (Trinidad Rd) West Service Road": 30,
+  "Manuel Roxas Road": 30,
+  "Military Cut-off": 30,
+  "North Drive": 30,
+  "Outlook Drive": 30,
+  "PMA Cut Off Road 1": 30,
+  "PMA Cut Off Road 2": 30,
+  "Quezon Hill Drive": 30,
+  "Quezon Hill Road": 30,
+  "Quezon Hill Road #1": 30,
+  "South Drive": 30,
+  "Sto. Tomas–Mount Cabuyao Road": 30,
+  "UP Drive": 30,
+
+  // 🟢 Roads with 40 kph for cars/motorcycles
+  "Balatoc Road": 40,
+  "Eastern Link Circumferential": 40,
+
+  // 🔴 Roads with 20 kph for all vehicle types
+  "Abad Santos Road": 20,
+  "Abanao Extension": 20,
+  "Chanum": 20,
+  "Chuntug #1": 20,
+  "Chuntug #2": 20,
+  "Fr. F. Carlu Street": 20,
+  "General Luna Road": 20,
+  "Governor Pack": 20,
+  "Government Center Road": 20,
+  "Government Center Cut-off": 20,
+  "Lake Drive 2": 20,
+  "P. Burgos Road": 20,
+  "Rimando–Ambiong Road": 20,
+  "Yandok Street": 20,
+  "Zandueta Street": 20
 };
 
 // Helper to choose color based on speed limit
