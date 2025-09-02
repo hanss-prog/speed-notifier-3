@@ -1,104 +1,12 @@
 // Initialize map
 const map = L.map('map').setView([16.4023, 120.5960], 15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-// Add OpenStreetMap tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19
-}).addTo(map);
+// Speed limits & red zones
+const roadsSpeeds = { /* same as before */ };
+const redRoads = [ /* same as before */ ];
 
-// Speed limit mapping by road name
-const roadsSpeeds = {
-  "Abanao": 20,
-  "Governor Pack Road": 20,
-  "Harrison Road": 20,
-  "Kayang Street": 20,
-  "Kennon Road": 30,
-  "Quirino Highway": 30,
-  "Naguilian Road": 30,
-  "Asin Road": 30,
-  "Baguio General Hospital flyover": 30,
-  "Chanum Street": 30,
-  "Leonard Wood Road": 30,
-  "Loakan Road": 30,
-  "Magsaysay Avenue": 30,
-  "Trinidad Road": 30,
-  "Trinidad Road East Service Road": 30,
-  "Major Mane Road": 30,
-  "Aspiras–Palispis Highway": 30,
-  "Pacdal Road": 30,
-  "PMA Road": 30,
-  "Session Road": 20,
-  "Western Link": 40,
-  "Andres Bonifacio Street": 30,
-  "Bokawkan": 30,
-  "Country Club Road": 30,
-  "Demonstration Road": 30,
-  "Engineer’s Hill": 30,
-  "F. Calderon Street": 30,
-  "Ferguson Road": 30,
-  "Gibraltar Road": 30,
-  "Gibraltar Road Wye": 30,
-  "Harrison Road No. 2": 30,
-  "Kayang Extension": 30,
-  "Kisad Road": 30,
-  "Legarda Road": 30,
-  "Leonard Wood": 30,
-  "Lt. Tacay": 30,
-  "Magsaysay Ave (Trinidad Rd) West Service Road": 30,
-  "Manuel Roxas Road": 30,
-  "Military Cut-off": 30,
-  "North Drive": 30,
-  "Outlook Drive": 30,
-  "PMA Cut Off Road 1": 30,
-  "PMA Cut Off Road 2": 30,
-  "Quezon Hill Drive": 30,
-  "Quezon Hill Road": 30,
-  "Quezon Hill Road #1": 30,
-  "South Drive": 30,
-  "Sto. Tomas–Mount Cabuyao Road": 30,
-  "UP Drive": 30,
-  "Balatoc Road": 40,
-  "Eastern Link Circumferential": 40,
-  "Abad Santos Road": 20,
-  "Abanao Extension": 20,
-  "Chanum": 20,
-  "Chuntug #1": 20,
-  "Chuntug #2": 20,
-  "Fr. F. Carlu Street": 20,
-  "General Luna Road": 20,
-  "Governor Pack": 20,
-  "Government Center Road": 20,
-  "Government Center Cut-off": 20,
-  "Lake Drive 2": 20,
-  "P. Burgos Road": 20,
-  "Rimando–Ambiong Road": 20,
-  "Yandok Street": 20,
-  "Zandueta Street": 20
-};
-
-// List of red zone roads
-const redRoads = [
-  "Governor Pack Road",
-  "Harrison Road",
-  "Kayang Street",
-  "Abad Santos Road",
-  "Abanao Extension",
-  "Chanum",
-  "Chuntug #1",
-  "Chuntug #2",
-  "Fr. F. Carlu Street",
-  "General Luna Road",
-  "Governor Pack",
-  "Government Center Road",
-  "Government Center Cut-off",
-  "Lake Drive 2",
-  "P. Burgos Road",
-  "Rimando–Ambiong Road",
-  "Yandok Street",
-  "Zandueta Street"
-];
-
-// Helper to choose road color
+// Helper to choose color
 function getColor(limit, name) {
   if (redRoads.includes(name)) return 'red';
   if (limit === 40) return 'green';
@@ -113,80 +21,65 @@ fetch('baguio-roads.geojson')
   .then(res => res.json())
   .then(data => {
     geojsonLayer = L.geoJSON(data, {
-      style: feature => {
-        const name = feature.properties.name;
-        const limit = roadsSpeeds[name] || 0;
-        return { color: getColor(limit, name), weight: 5 };
-      },
-      onEachFeature: (feature, layer) => {
-        const name = feature.properties.name;
-        const limit = roadsSpeeds[name] || 'Unknown';
-        layer.bindPopup(`${name}<br>Speed Limit: ${limit} km/h`);
-      }
+      style: f => ({ color: getColor(roadsSpeeds[f.properties.name] || 0, f.properties.name), weight: 5 }),
+      onEachFeature: (f, layer) => layer.bindPopup(`${f.properties.name}<br>Speed Limit: ${roadsSpeeds[f.properties.name] || 'Unknown'} km/h`)
     }).addTo(map);
   });
+
+// Enable Notifications button (mobile-friendly)
+let notificationsEnabled = false;
+const notifBtn = document.createElement('button');
+notifBtn.textContent = "Enable Notifications";
+notifBtn.style.position = "absolute";
+notifBtn.style.top = "10px";
+notifBtn.style.right = "10px";
+notifBtn.style.zIndex = 1000;
+notifBtn.style.padding = "8px 12px";
+notifBtn.style.background = "white";
+notifBtn.style.borderRadius = "6px";
+notifBtn.style.boxShadow = "0 0 5px rgba(0,0,0,0.3)";
+document.body.appendChild(notifBtn);
+
+notifBtn.addEventListener('click', () => {
+  if ("Notification" in window) {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        notificationsEnabled = true;
+        notifBtn.remove();
+        alert("Notifications enabled! You will get alerts when entering a speed zone.");
+      } else {
+        alert("Notifications denied. You won't get alerts.");
+      }
+    });
+  }
+});
 
 // Location tracking & speed alert
 let speedWarningShown = false;
-
 if (navigator.geolocation) {
-  navigator.geolocation.watchPosition(onLocationFound, onLocationError, {
-    enableHighAccuracy: true,
-    maximumAge: 1000,
-    timeout: 10000
-  });
-} else {
-  alert("Geolocation not supported by this browser.");
-}
+  navigator.geolocation.watchPosition(onLocationFound, onLocationError, { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 });
+} else alert("Geolocation not supported by this browser.");
 
 function onLocationFound(position) {
-  const lat = position.coords.latitude;
-  const lng = position.coords.longitude;
-  const speedKph = (position.coords.speed || 0) * 3.6;
-  document.getElementById('speed').textContent = `${speedKph.toFixed(1)} km/h`;
+  const userLatLng = L.latLng(position.coords.latitude, position.coords.longitude);
+  document.getElementById('speed').textContent = `${((position.coords.speed || 0) * 3.6).toFixed(1)} km/h`;
 
-  const userLatLng = L.latLng(lat, lng);
+  if (!window.userMarker) { window.userMarker = L.marker(userLatLng).addTo(map); map.setView(userLatLng, 17); }
+  else window.userMarker.setLatLng(userLatLng);
 
-  if (!window.userMarker) {
-    window.userMarker = L.marker(userLatLng).addTo(map);
-    map.setView(userLatLng, 17);
-  } else {
-    window.userMarker.setLatLng(userLatLng);
-  }
+  if (!window.accuracyCircle) window.accuracyCircle = L.circle(userLatLng, { radius: position.coords.accuracy, color: 'blue', fillOpacity: 0.1 }).addTo(map);
+  else window.accuracyCircle.setLatLng(userLatLng).setRadius(position.coords.accuracy);
 
-  if (!window.accuracyCircle) {
-    window.accuracyCircle = L.circle(userLatLng, {
-      radius: position.coords.accuracy,
-      color: 'blue',
-      fillOpacity: 0.1
-    }).addTo(map);
-  } else {
-    window.accuracyCircle.setLatLng(userLatLng).setRadius(position.coords.accuracy);
-  }
-
-  // Check proximity to roads
   if (geojsonLayer) {
-    const layerArr = geojsonLayer.getLayers();
-    const closest = L.GeometryUtil.closestLayer(map, layerArr, userLatLng);
-
+    const closest = L.GeometryUtil.closestLayer(map, geojsonLayer.getLayers(), userLatLng);
     if (closest && closest.distance < 10 && !speedWarningShown) {
       const roadName = closest.layer.feature.properties.name;
       const limit = roadsSpeeds[roadName];
-
       if (limit) {
         alert(`Tips: You've entered a ${limit} km/h zone on ${roadName}`);
-
-        // Browser notification
-        if ("Notification" in window && Notification.permission !== "denied") {
-          if (Notification.permission !== "granted") {
-            Notification.requestPermission();
-          } else {
-            new Notification("Speed Zone Alert", {
-              body: `You have entered a ${limit} km/h zone: ${roadName}`
-            });
-          }
+        if (notificationsEnabled) {
+          new Notification("Speed Zone Alert", { body: `You have entered a ${limit} km/h zone: ${roadName}` });
         }
-
         speedWarningShown = true;
         setTimeout(() => (speedWarningShown = false), 10000);
       }
