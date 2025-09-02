@@ -6,18 +6,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Legacy polygon (can be removed if not needed)
-const speedZones = [
-  {
-    name: "Session Road",
-    speedLimit: 30,
-    area: L.polygon([
-      [16.4115, 120.5965],
-      [16.4115, 120.5985],
-      [16.4095, 120.5985],
-      [16.4095, 120.5965]
-    ], { color: 'red' }).addTo(map)
-  }
-];
+
 
 // Legacy manual polylines
 const speedSegments = [
@@ -25,7 +14,7 @@ const speedSegments = [
     name: "Session Road",
     speedLimit: 30,
     color: "red",
-    path: [[16.4115,120.5965],[16.4110,120.5970],[16.4105,120.5975],[16.4100,120.5980]]
+    path: [[16.40965, 120.59685],[16.40995, 120.59710],[16.41035, 120.59735],[16.41075, 120.59745],[16.41105, 120.59755],[16.41145, 120.59765],[16.41185, 120.59770]]
   },
   {
     name: "Military Cutoff",
