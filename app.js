@@ -1,6 +1,9 @@
 // Initialize map
 const map = L.map('map').setView([16.4023, 120.5960], 15);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
 
 // Legacy polygon (can be removed if not needed)
 const speedZones = [
@@ -18,10 +21,24 @@ const speedZones = [
 
 // Legacy manual polylines
 const speedSegments = [
-  { name: "Session Road", speedLimit: 30, color: "red", path: [[16.4115,120.5965],[16.4110,120.5970],[16.4105,120.5975],[16.4100,120.5980]] },
-  { name: "Military Cutoff", speedLimit: 40, color: "orange", path: [[16.4030,120.5920],[16.4025,120.5930],[16.4020,120.5940]] }
+  {
+    name: "Session Road",
+    speedLimit: 30,
+    color: "red",
+    path: [[16.4115,120.5965],[16.4110,120.5970],[16.4105,120.5975],[16.4100,120.5980]]
+  },
+  {
+    name: "Military Cutoff",
+    speedLimit: 40,
+    color: "orange",
+    path: [[16.4030,120.5920],[16.4025,120.5930],[16.4020,120.5940]]
+  }
 ];
-const segmentLayers = speedSegments.map(s => ({ ...s, layer: L.polyline(s.path, { color: s.color, weight: 8 }).addTo(map) }));
+
+const segmentLayers = speedSegments.map(s => ({
+  ...s,
+  layer: L.polyline(s.path, { color: s.color, weight: 8 }).addTo(map)
+}));
 
 // Speed limit mapping by road name
 const roadsSpeeds = {
@@ -36,7 +53,7 @@ const roadsSpeeds = {
   "Quirino Highway": 30,
   "Naguilian Road": 30,
 
-  // 🟠 Secondary Roads (assumed 30 kph for cars/motorcycles)
+  // 🟠 Secondary Roads (30 kph)
   "Asin Road": 30,
   "Baguio General Hospital flyover": 30,
   "Chanum Street": 30,
@@ -52,7 +69,7 @@ const roadsSpeeds = {
   "Session Road": 20,
   "Western Link": 40,
 
-  // 🟠 Tertiary Roads (mostly 30 kph for cars/motorcycles)
+  // 🟠 Tertiary Roads (30 kph)
   "Andres Bonifacio Street": 30,
   "Bokawkan": 30,
   "Country Club Road": 30,
@@ -82,11 +99,11 @@ const roadsSpeeds = {
   "Sto. Tomas–Mount Cabuyao Road": 30,
   "UP Drive": 30,
 
-  // 🟢 Roads with 40 kph for cars/motorcycles
+  // 🟢 Roads with 40 kph
   "Balatoc Road": 40,
   "Eastern Link Circumferential": 40,
 
-  // 🔴 Roads with 20 kph for all vehicle types
+  // 🔴 Roads with 20 kph
   "Abad Santos Road": 20,
   "Abanao Extension": 20,
   "Chanum": 20,
@@ -104,15 +121,38 @@ const roadsSpeeds = {
   "Zandueta Street": 20
 };
 
-// Helper to choose color based on speed limit
-function getColor(limit) {
-  if (limit <= 20) return 'red';
-  if (limit === 30) return 'orange';
+// 🚨 List of red zone roads
+const redRoads = [
+  "Governor Pack Road",
+  "Harrison Road",
+  "Kayang Street",
+  "Abad Santos Road",
+  "Abanao Extension",
+  "Chanum",
+  "Chuntug #1",
+  "Chuntug #2",
+  "Fr. F. Carlu Street",
+  "General Luna Road",
+  "Governor Pack",
+  "Government Center Road",
+  "Government Center Cut-off",
+  "Lake Drive 2",
+  "P. Burgos Road",
+  "Rimando–Ambiong Road",
+  "Yandok Street",
+  "Zandueta Street"
+];
+
+// ✅ Helper to choose color based on speed + red zone override
+function getColor(limit, name) {
+  if (redRoads.includes(name)) return 'red';
   if (limit === 40) return 'green';
+  if (limit === 30) return 'orange';
+  if (limit <= 20) return 'red';
   return 'blue';
 }
 
-// Load GeoJSON roads, style them, and keep a reference for proximity checks
+// Load GeoJSON and style
 let geojsonLayer;
 fetch('baguio-roads.geojson')
   .then(res => res.json())
@@ -121,7 +161,7 @@ fetch('baguio-roads.geojson')
       style: feature => {
         const name = feature.properties.name;
         const limit = roadsSpeeds[name] || 0;
-        return { color: getColor(limit), weight: 5 };
+        return { color: getColor(limit, name), weight: 5 };
       },
       onEachFeature: (feature, layer) => {
         const name = feature.properties.name;
@@ -131,9 +171,7 @@ fetch('baguio-roads.geojson')
     }).addTo(map);
   });
 
-// Use GeometryUtil to detect proximity
-// Make sure to include Leaflet.GeometryUtil via script in HTML
-
+// ⚡ Speed warning + location tracking
 let speedWarningShown = false;
 
 if (navigator.geolocation) {
@@ -150,6 +188,7 @@ function onLocationFound(position) {
   const lat = position.coords.latitude;
   const lng = position.coords.longitude;
   const speedKph = (position.coords.speed || 0) * 3.6;
+
   document.getElementById('speed').textContent = `${speedKph.toFixed(1)} km/h`;
 
   const userLatLng = L.latLng(lat, lng);
@@ -173,26 +212,43 @@ function onLocationFound(position) {
       .setRadius(position.coords.accuracy);
   }
 
-  // Check GeoJSON roads proximity
+  // 🚧 Check GeoJSON road proximity
   if (geojsonLayer) {
     const layerArr = geojsonLayer.getLayers();
     const closest = L.GeometryUtil.closestLayer(map, layerArr, userLatLng);
+
     if (closest && closest.distance < 10 && !speedWarningShown) {
       const roadName = closest.layer.feature.properties.name;
       const limit = roadsSpeeds[roadName];
+
       if (limit) {
         alert(`Tips: You've entered a ${limit} km/h zone on ${roadName}`);
+
+        // 🔔 Notify if red zone
+        if (redRoads.includes(roadName) && "Notification" in window) {
+          if (Notification.permission === "granted") {
+            new Notification("Red Zone Alert", {
+              body: `You have entered a RED speed zone: ${roadName}`
+            });
+          } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+              if (permission === "granted") {
+                new Notification("Red Zone Alert", {
+                  body: `You have entered a RED speed zone: ${roadName}`
+                });
+              }
+            });
+          }
+        }
+
         speedWarningShown = true;
         setTimeout(() => (speedWarningShown = false), 10000);
       }
     }
   }
-
-  // Additional checks for polygons or manual segments if desired
 }
 
 function onLocationError(err) {
   console.warn(`GPS error (${err.code}): ${err.message}`);
   alert("GPS Error: " + err.message);
 }
-
