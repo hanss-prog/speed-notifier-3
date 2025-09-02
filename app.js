@@ -5,19 +5,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19
 }).addTo(map);
 
-// Legacy polygon (can be removed if not needed)
-const speedZones = [
-  {
-    name: "Session Road",
-    speedLimit: 30,
-    area: L.polygon([
-      [16.4115, 120.5965],
-      [16.4115, 120.5985],
-      [16.4095, 120.5985],
-      [16.4095, 120.5965]
-    ], { color: 'green' }).addTo(map)
-  }
-];
 
 // Legacy manual polylines
 const speedSegments = [
