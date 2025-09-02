@@ -15,7 +15,7 @@ const speedZones = [
       [16.4115, 120.5985],
       [16.4095, 120.5985],
       [16.4095, 120.5965]
-    ], { color: 'red' }).addTo(map)
+    ], { color: 'green' }).addTo(map)
   }
 ];
 
