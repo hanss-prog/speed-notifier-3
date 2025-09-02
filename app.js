@@ -18,7 +18,7 @@ const speedZones = [
   }
 ];
 
-// 🔴 Road-based speed segments (polylines)
+// 🔴 Road-based speed segments (manual polylines)
 const speedSegments = [
   {
     name: "Session Road",
@@ -49,6 +49,57 @@ const segmentLayers = speedSegments.map(segment => {
     layer: L.polyline(segment.path, { color: segment.color, weight: 8 }).addTo(map)
   };
 });
+
+// Roads and their speed limits
+const roadsSpeeds = {
+  // Primary Roads (20 kph)
+  "Abanao": 20, "Governor Pack Road": 20, "Harrison Road": 20, "Kayang Street": 20,
+  // Primary Roads (30 kph)
+  "Kennon Road":30, "Quirino Highway":30, "Naguilian Road":30,
+  // Secondary roads
+  "Asin Road":30, "Baguio General Hospital flyover":30, "Chanum Street":30,
+  "Leonard Wood Road":30, "Loakan Road":30, "Magsaysay Avenue":30,
+  "Trinidad Road":30, "Major Mane Road":30, "Aspiras–Palispis Highway":30,
+  "Pacdal Road":30, "Session Road":20, "Western Link":40,
+  // Tertiary roads
+  "Military Cut-off":30, "Andres Bonifacio Street":30, "Bokawkan Road":30,
+  "Country Club Road":30, "Demonstration Road":30, "Gibraltar Road":30,
+  "Harrison Road No. 2":30, "Kayang Extension":30, "Kisad Road":30,
+  "Legarda Road":30, "Lt. Tacay":30, "Manuel Roxas Road":30,
+  "North Drive":30, "Outlook Drive":30, "PMA Road":30,
+  "Quezon Hill Drive":30, "South Drive":30, "Sto. Tomas–Mount Cabuyao Road":30,
+  "UP Drive":30,
+  "Balatoc Road":40, "Eastern Link Circumferential":40,
+  "Abad Santos Road":20, "Abanao Extension":20, "Chuntug":20,
+  "Fr. F. Carlu Street":20, "General Luna Road":20, "Government Center Road":20,
+  "Rimando–Ambiong Road":20, "Yandok Street":20, "Zandueta Street":20
+};
+
+// Color function by speed limit
+function getColor(limit) {
+  if (limit <= 20) return 'red';
+  if (limit === 30) return 'orange';
+  if (limit === 40) return 'green';
+  return 'blue';
+}
+
+// Load external Baguio roads from GeoJSON and color them by speed limit
+fetch('baguio-roads.geojson')
+  .then(response => response.json())
+  .then(data => {
+    L.geoJSON(data, {
+      style: feature => {
+        const name = feature.properties.name;
+        const speedLimit = roadsSpeeds[name] || 25; // Default if unknown
+        return { color: getColor(speedLimit), weight: 4 };
+      },
+      onEachFeature: (feature, layer) => {
+        const name = feature.properties.name;
+        const speedLimit = roadsSpeeds[name] || 25;
+        layer.bindPopup(`${name}<br>Speed Limit: ${speedLimit} km/h`);
+      }
+    }).addTo(map);
+  });
 
 let speedWarningShown = false;
 
@@ -103,7 +154,7 @@ function onLocationFound(position) {
     }
   }
 
-  // ✅ Check road segment speed zones
+  // Check manual road segments speed zones
   for (let segment of segmentLayers) {
     if (isNearSegment(lat, lng, segment.path)) {
       if (speedKph > segment.speedLimit && !speedWarningShown) {
@@ -117,7 +168,7 @@ function onLocationFound(position) {
   }
 }
 
-// 📏 Helper function: Check if user is near a segment
+// Helper: Check if user is near a polyline segment
 function isNearSegment(lat, lng, path, maxDistance = 20) {
   const point = L.latLng(lat, lng);
   for (let i = 0; i < path.length - 1; i++) {

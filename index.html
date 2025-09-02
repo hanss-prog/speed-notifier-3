@@ -4,8 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Speed Limit Notifier</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <!-- Your Custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Page Styles -->
   <style>
     #map { height: 100vh; }
     #speed-info {
@@ -24,7 +30,13 @@
   <div id="speed-info">Speed: <span id="speed">0</span> km/h</div>
   <div id="map"></div>
 
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Turf.js for spatial calculations -->
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
+  <!-- Your App Script -->
   <script src="app.js"></script>
 </body>
 </html>
