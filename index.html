@@ -8,11 +8,9 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-  <!-- Your Custom CSS -->
-  <link rel="stylesheet" href="style.css" />
-
   <!-- Page Styles -->
   <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
     #map { height: 100vh; }
     #speed-info {
       position: absolute;
@@ -33,13 +31,13 @@
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- Leaflet.GeometryUtil (add this right after Leaflet.js) -->
+  <!-- Leaflet.GeometryUtil for distance to polyline -->
   <script src="https://unpkg.com/leaflet-geometryutil"></script>
 
-  <!-- Turf.js for spatial calculations (optional if needed) -->
+  <!-- Turf.js (optional for spatial calculations if needed) -->
   <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 
-  <!-- Your App Script (must come after all the above libraries) -->
+  <!-- Your App Script -->
   <script src="app.js"></script>
 </body>
 </html>
