@@ -1,0 +1,10 @@
+{
+  "appId": "com.example.speednotifier",
+  "appName": "Speed Notifier",
+  "webDir": "www",
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false
+    }
+  }
+}
