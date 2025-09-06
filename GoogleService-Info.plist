@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBTTf1T892dzgbJCskgm46PqxzRzjnVpHk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>378577574214</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.uc.speedapp</string>
+	<key>PROJECT_ID</key>
+	<string>pinepace-cd3bc</string>
+	<key>STORAGE_BUCKET</key>
+	<string>pinepace-cd3bc.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:378577574214:ios:bf6e91c819cf2c110a6d47</string>
+</dict>
+</plist>

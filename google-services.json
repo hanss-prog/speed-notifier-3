@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "378577574214",
+    "project_id": "pinepace-cd3bc",
+    "storage_bucket": "pinepace-cd3bc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378577574214:android:f85a35d98bb229a10a6d47",
+        "android_client_info": {
+          "package_name": "com.uc.speedapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7jrcHloM3hwCVaab4RDTB0CJI6wHtoCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
